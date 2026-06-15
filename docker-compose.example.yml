@@ -1,4 +1,4 @@
-# ZZZ — example docker-compose file (self-hosting)
+# Zzz App — example docker-compose file (self-hosting)
 #
 # This is a TEMPLATE, not a live config. It is named `.example.yml` so that
 # `docker compose` does not auto-discover it. To use:

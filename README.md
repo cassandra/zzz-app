@@ -128,30 +128,56 @@ repository**, not a fork — there is no `upstream` remote back to the template.
 **Branch model.** `staging` is the **default branch on GitHub** and the target
 for all PRs — it holds the latest code. `master` holds the latest *released*
 code; the [release process](docs/dev/workflow/release-process.md) promotes
-`staging` to `master`. So a new repo starts on `staging`, and `master` first appears at
-your first release. (The one-line installer pulls released code from `master`,
-which is why the `install.sh`/`update.sh` raw URLs reference `/master/`.)
+`staging` to `master`. (The one-line installer pulls released code from
+`master`, which is why the `install.sh`/`update.sh` raw URLs reference
+`/master/`.)
 
-```bash
-# 1. Initialize a fresh repo on staging (the default/integration branch).
-git init -b staging
-git add -A
-git commit -m "Initial commit (from the Zzz App template)"
+The steps below use the **GitHub web UI** plus a few git commands. Comfortable on
+the CLI? The `gh` equivalents (e.g. `gh repo create <owner>/<project> --source=.
+--remote=origin --push`) collapse several of these — translate as you like.
 
-# 2. Create the GitHub repo and push. With the GitHub CLI, one command does both
-#    and makes staging the default branch (it's the branch being pushed):
-gh repo create <owner>/<project> --private --source=. --remote=origin --push
-#    (Or create the empty repo in the UI, then:
-#       git remote add origin git@github.com:<owner>/<project>.git
-#       git push -u origin staging )
-```
+1. **Initialize the local repo on `staging`.**
+   ```bash
+   git init -b staging
+   git add -A
+   git commit -m "Initial commit (from the Zzz App template)"
+   ```
 
-Then complete the one-time **repository configuration** — set the default branch
-to `staging`, protect it, enable Actions, make the GHCR package public, create
-the `rollback`/`critical` labels, enable Discussions — in
-[GitHub Setup](docs/dev/project/github-setup.md). That configuration is what
-makes the CI/CD and the registry-distributed install methods (1–2 below) work;
-a from-source build (method 3) needs none of it.
+2. **Create an empty GitHub repo.** Log in at <https://github.com> and create a
+   new repository at <https://github.com/new> — **empty** (no README, `.gitignore`,
+   or license; you already have them). Note its `<owner>/<project>`.
+
+3. **Connect the remote and push `staging`.**
+   ```bash
+   git remote add origin git@github.com:<owner>/<project>.git
+   git config --global user.email "you@example.com"   # one-time, if not already set
+   git config --global credential.helper cache        # one-time, optional
+   git push -u origin staging
+   ```
+
+4. **Create and push `master`** (starts equal to `staging`; the first release
+   merge advances it):
+   ```bash
+   git checkout -b master
+   git push -u origin master
+   git checkout staging
+   ```
+
+5. **Set the default branch.** At
+   `https://github.com/<owner>/<project>/settings`, set **Default branch** to
+   `staging`.
+
+6. **Add branch protection.** At
+   `https://github.com/<owner>/<project>/settings/branches`, add a branch ruleset
+   for `staging` and one for `master`, with whatever rules suit how you work.
+   (CI's `Django Tests` status check only becomes available to *require* after a
+   PR has triggered it at least once.)
+
+Then finish the one-time **repository configuration** the CI/CD and
+registry-distributed installs rely on — enable Actions, make the GHCR package
+public, create the `rollback`/`critical` labels, enable Discussions — in
+[GitHub Setup](docs/dev/project/github-setup.md). A from-source build (install
+method 3) needs none of it.
 
 ## Choose your install method
 

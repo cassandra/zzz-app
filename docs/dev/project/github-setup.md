@@ -26,10 +26,13 @@ branch names are referenced in `.github/workflows/django-tests.yml`
 (`/master/`, which serve *released* code), the release/rollback flows, and the
 `/pickup` `/cleanup` `/release` commands; swap them there too if you rename.
 
-**Recommended:** protect both branches (*Settings -> Branches*): require the
-`Django Tests` check and a PR review on `staging`, and restrict direct pushes to
-`master` to the release merge. The workflow ("never commit to master directly")
-assumes this.
+**Branch protection (your call):** add branch rulesets for `staging` and
+`master` (*Settings -> Branches*) to suit how you work -- this project does not
+prescribe a specific policy. Two neutral facts to keep in mind: the
+`Django Tests` status check cannot be *required* until a PR has triggered it at
+least once (it isn't selectable before then); and `master` must stay directly
+pushable by whoever cuts releases, since the release is a `git push origin
+master` merge, not a PR (see [Release Process](../workflow/release-process.md)).
 
 ## 2. GitHub Actions
 
@@ -70,17 +73,19 @@ registry-distributed install methods 1-2 do.)
 `.github/ISSUE_TEMPLATE/config.yaml` sets `blank_issues_enabled: false` and adds
 a contact link to `https://github.com/<owner>/zzz/discussions`.
 
-**Setup:** enable Discussions (*Settings -> General -> Features*), or edit/remove
-that contact link in `config.yaml` if you will not use Discussions (otherwise the
-link 404s).
+**Setup:** enable Discussions so that link doesn't 404 -- at
+`https://github.com/<owner>/<project>/settings` (the *General* page), scroll to
+**Features** and check **Discussions**. If you won't use Discussions, instead
+edit/remove that contact link in `config.yaml`.
 
 ## 5. Labels
 
 - The issue templates apply standard labels (`bug`, `enhancement`, ...) -- the
   defaults GitHub ships are sufficient.
 - `rollback.yml` opens a tracking issue labeled **`rollback`** and **`critical`**.
-  Create those two labels (*Issues -> Labels*) before the first rollback, or the
-  issue-creation step fails.
+  Create those two labels before the first rollback, or the issue-creation step
+  fails: go to *Issues -> Labels*, click **New label**, and add `rollback` and
+  `critical` (any color/description).
 
 ## 6. Templates and reviewer
 
@@ -98,7 +103,7 @@ Every workflow slash command (`/pickup`, `/createissue`, `/pr`, `/commit`,
 ## Quick checklist
 
 - [ ] Default branch is `staging`; `master` exists for released code
-- [ ] `staging` protected (require `Django Tests` + a review); direct pushes to `master` restricted to the release merge -- recommended
+- [ ] Branch rulesets for `staging` and `master` configured to your taste (keep `master` pushable for the release merge)
 - [ ] Actions enabled
 - [ ] After the first Release: GHCR package set **Public** and linked to the repo
 - [ ] Discussions enabled (or the `config.yaml` contact link edited/removed)
