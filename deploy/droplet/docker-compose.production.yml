@@ -1,0 +1,19 @@
+# ZZZ — droplet/cloud production compose file.
+#
+# Deployed to the droplet by deploy/droplet/deploy-prod.sh (which scp's this
+# file as docker-compose.yml alongside the converted env file zzz.env). Uses
+# network_mode: host so the container reaches the host's MySQL and redis on
+# localhost. The image is the droplet build (mysqlclient, no bundled redis),
+# loaded onto the droplet from a `docker save` tar by deploy-prod.sh.
+#
+# No healthcheck: stanza — the Dockerfile defines one (HEALTHCHECK on /health).
+version: '3.8'
+
+services:
+  zzz:
+    image: zzz:${ZZZ_VERSION:-latest}
+    container_name: zzz
+    restart: unless-stopped
+    network_mode: host
+    env_file:
+      - zzz.env
