@@ -1,3 +1,4 @@
+# Manual dispatch: re-point :latest to a prior version and flag a bad release.
 name: Rollback Release
 
 on:

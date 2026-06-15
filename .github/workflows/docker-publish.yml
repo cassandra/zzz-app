@@ -1,3 +1,5 @@
+# On a published Release (or manual dispatch): build the self-host image and
+# push it to GHCR as :<version> and :latest.
 name: Build and Publish Docker Image
 
 on:

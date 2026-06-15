@@ -1,3 +1,4 @@
+# Runs the test suite on every pull request into `master` or `staging`.
 name: Django Tests
 
 on:

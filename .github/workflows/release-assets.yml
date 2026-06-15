@@ -1,3 +1,4 @@
+# On a published Release: build a source archive and attach it to the release.
 name: Create Release Assets
 
 on:
