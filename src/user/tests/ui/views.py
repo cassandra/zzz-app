@@ -1,6 +1,7 @@
 from typing import Dict
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core.exceptions import BadRequest
 from django.shortcuts import render
 from django.views.generic import View
@@ -40,15 +41,26 @@ class TestUiSendSigninEmailView( View ):
         if not EmailSender.is_email_configured():
             raise NotImplementedError('Email is not configured for this server.')
 
-        if request.user.is_anonymous or not request.user.email:
-            email_address = settings.EMAIL_HOST_USER
-        else:
+        # The magic-link token is built from a real user (Django's token
+        # generator reads `user.last_login`, which AnonymousUser lacks). When a
+        # developer opens this dev-only link without being signed in, fall back
+        # to the configured address and any existing user, purely so the email
+        # renders and sends.
+        User = get_user_model()
+        if request.user.is_authenticated and request.user.email:
+            user = request.user
             email_address = request.user.email
+        else:
+            email_address = settings.EMAIL_HOST_USER
+            user = User.objects.filter( email = email_address ).first() or User.objects.first()
+            if user is None:
+                raise BadRequest( 'No user exists to build a signin token; run "manage.py bootstrap".' )
 
         email_type = kwargs.get('email_type')
         if email_type == 'signin_magic_link':
             user_auth_data = UserAuthenticationData(
                 request = request,
+                override_user = user,
                 override_email = email_address,
             )
             SigninManager().send_signin_magic_link_email(
