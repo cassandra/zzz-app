@@ -4,4 +4,4 @@
 
 _High-level view of the applications change history.  See releases and commits for more fine-grained history.
 
-- v0.0.1 : {MONTH} {DAY}, {YEAR} : {DESCRIPTION}
+- v0.0.1 : June 15, 2026 : Initial release of the project template.
