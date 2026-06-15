@@ -6,7 +6,7 @@ set -e  # Exit on any error
 # Requires: Docker and existing installation
 
 # Configuration
-DOCKER_IMAGE="ghcr.io/cassandra/zzz"
+DOCKER_IMAGE="ghcr.io/cassandra/zzz-app"
 DOCKER_TAG="${1:-latest}"  # Allow override for testing (default: latest)
 CONTAINER_NAME="zzz"
 EXTERNAL_PORT="9666"

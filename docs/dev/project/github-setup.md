@@ -109,7 +109,7 @@ Every workflow slash command (`/pickup`, `/createissue`, `/pr`, `/commit`,
 - [ ] Discussions enabled (or the `config.yaml` contact link edited/removed)
 - [ ] `rollback` and `critical` labels created
 - [ ] PR-template reviewer (`@cassandra`) updated to a real user/team
-- [ ] Owner/repo identity (`cassandra/zzz`) updated wherever it appears -- image path, install/update raw URLs, discussions URL, PR reviewer
+- [ ] Owner/repo identity (`cassandra/zzz-app`) updated wherever it appears -- image path, install/update raw URLs, discussions URL, PR reviewer
 - [ ] Contributors have `gh` installed and authenticated
 
 ## Related Documentation

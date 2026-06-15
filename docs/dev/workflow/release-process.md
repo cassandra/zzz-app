@@ -9,7 +9,7 @@ reaches it by merging `staging`. Publishing a GitHub Release for the tag trigger
 two workflows that do the actual distribution:
 
 - `.github/workflows/docker-publish.yml` builds `deploy/local/Dockerfile` and
-  pushes `ghcr.io/cassandra/zzz:<version>` and `:latest` (linux/amd64 + arm64).
+  pushes `ghcr.io/cassandra/zzz-app:<version>` and `:latest` (linux/amd64 + arm64).
 - `.github/workflows/release-assets.yml` attaches a source archive (`zzz.zip`).
 
 Self-host users then get the new image via `install.sh` / `update.sh`. (The
@@ -61,14 +61,14 @@ notes, set as latest, publish.
 
 ### 4. Verify the workflows
 On the Actions page, confirm both succeeded:
-- **Build and Publish Docker Image** -> `ghcr.io/cassandra/zzz:v1.4.0` and
+- **Build and Publish Docker Image** -> `ghcr.io/cassandra/zzz-app:v1.4.0` and
   `:latest` exist in the registry.
 - **Create Release Assets** -> `zzz.zip` is attached to the release.
 
 ### 5. Validate the install
 Confirm the published image installs cleanly (ideally on a clean machine):
 ```bash
-curl -fsSL https://raw.githubusercontent.com/cassandra/zzz/master/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/cassandra/zzz-app/master/install.sh | bash
 ```
 
 ### 6. Open the next development version on `staging`

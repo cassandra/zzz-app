@@ -14,7 +14,7 @@ How to install the app and manage your installation day-to-day. For deployment b
 **One command gets you running in 30 seconds:**
 
 ```shell
-curl -fsSL https://raw.githubusercontent.com/cassandra/zzz/master/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/cassandra/zzz-app/master/install.sh | bash
 ```
 
 **What it does:**
@@ -53,7 +53,7 @@ docker ps | grep zzz     # status / health
 Run the update script — it pulls the latest image and recreates the container, preserving your data:
 
 ```shell
-curl -fsSL https://raw.githubusercontent.com/cassandra/zzz/master/update.sh | bash
+curl -fsSL https://raw.githubusercontent.com/cassandra/zzz-app/master/update.sh | bash
 ```
 
 ## Environment Variable Changes

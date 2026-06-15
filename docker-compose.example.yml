@@ -25,7 +25,7 @@
 
 services:
   zzz:
-    image: ghcr.io/cassandra/zzz:latest
+    image: ghcr.io/cassandra/zzz-app:latest
     container_name: zzz
     restart: unless-stopped
     ports:

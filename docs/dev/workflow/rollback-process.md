@@ -43,7 +43,7 @@ decide on a fix afterward than to leave more users affected.
    - A tracking issue was created.
 
 ### What the workflow does automatically
-- Pulls `ghcr.io/cassandra/zzz:<rollback_to_version>` and re-tags it `:latest`,
+- Pulls `ghcr.io/cassandra/zzz-app:<rollback_to_version>` and re-tags it `:latest`,
   then pushes `:latest`.
 - Edits the bad release: prepends a rollback notice, marks it a prerelease to
   de-emphasize it.

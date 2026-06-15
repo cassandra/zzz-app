@@ -6,7 +6,7 @@ set -e  # Exit on any error
 # Requires: Docker
 
 # Configuration
-DOCKER_IMAGE="ghcr.io/cassandra/zzz"  # GitHub Container Registry
+DOCKER_IMAGE="ghcr.io/cassandra/zzz-app"  # GitHub Container Registry
 DOCKER_TAG="${1:-latest}"  # Allow override for testing (default: latest)
 CONTAINER_NAME="zzz"
 EXTERNAL_PORT="9666"
@@ -397,7 +397,7 @@ show_success() {
     echo -e "   Stop: docker stop ${CONTAINER_NAME}"
     echo -e "   Start: docker start ${CONTAINER_NAME}"
     echo -e "   Restart: docker restart ${CONTAINER_NAME}"
-    echo -e "   Update: curl -fsSL https://raw.githubusercontent.com/cassandra/zzz/master/update.sh | bash"
+    echo -e "   Update: curl -fsSL https://raw.githubusercontent.com/cassandra/zzz-app/master/update.sh | bash"
     echo
     echo -e "${GREEN}IMPORTANT: Save your admin credentials securely!${NC}"
     echo

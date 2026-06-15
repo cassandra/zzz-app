@@ -236,7 +236,7 @@ fi
 
 if [[ -z "$CURRENT_UPSTREAM" ]]; then
     print_notice "Adding upstream remote"
-    git remote add upstream https://github.com/cassandra/zzz.git
+    git remote add upstream https://github.com/cassandra/zzz-app.git
     print_success "Upstream remote configured"
 else
     print_success "Upstream remote already configured"

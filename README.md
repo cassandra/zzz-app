@@ -34,7 +34,7 @@ history and its own GitHub repo, with no link back here. Instead, take a
   unzip it where you want the project.
 - **Command line:**
   ```bash
-  curl -L https://github.com/cassandra/zzz/archive/refs/heads/master.tar.gz | tar xz
+  curl -L https://github.com/cassandra/zzz-app/archive/refs/heads/master.tar.gz | tar xz
   mv zzz-master my-project && cd my-project
   ```
 
@@ -113,7 +113,7 @@ them with the current prefix, so regenerate rather than hand-edit.
 | 9 | Brand color outside CSS (`#4c5bd4`) | `src/zzz/templates/manifest.json` (`theme_color`, `background_color`); `src/zzz/templates/pages/base.html` (`<meta name="theme-color">`); `src/zzz/static/img/antinode-loading.svg`; `src/notify/templates/notify/emails/base_email_message.html` (header/title; also a `#f5b945` accent border) | The same brand color as the `main.css` palette (row 7), hardcoded in these non-CSS spots a palette change won't catch. |
 | 10 | Placeholder landing copy | `src/zzz/templates/pages/home.html` (landing page); `src/zzz/templates/pages/main_default.html` (`Your tagline here.`) | Replace the placeholder home content and tagline text. |
 | 11 | Docker container/image name & data home (`zzz`, `~/.zzz`) | `Makefile` (`docker-build` image tags, `docker-stop` name); `deploy/local/run_container.sh` (image/container name, `ZZZ_HOME=~/.zzz`, default host port `9666`); `deploy/local/Dockerfile` (the `/etc/supervisor/conf.d/zzz.conf` filename); `install.sh`/`update.sh` (`CONTAINER_NAME`, `ZZZ_HOME`); and, for droplet adopters only, `deploy/droplet/*` (image name, `/opt/zzz`, paths) | String values a package rename won't catch, though all share the `zzz` token (a global acronym replace covers them). The default host port `9666` is the docker mapping (container is always `8000`). **Port convention:** the dev server runs on `8xxx` and the local/deployed (docker) server on `9xxx` — here `8666` / `9666`. The `xxx` is per-project (HI used `411`); change both in lockstep when adapting. This is the "ports" entry of row 5. |
-| 12 | GitHub owner & container registry (`cassandra`, `ghcr.io/cassandra/zzz`) | `install.sh` (`DOCKER_IMAGE` + the `update.sh` raw URL); `update.sh` (`DOCKER_IMAGE`); `docker-compose.example.yml` (`image:`); `dev/dev-setup.sh` (upstream remote); `.github/workflows/{docker-publish,rollback,release-assets}.yml` (image refs / archive name); `.github/ISSUE_TEMPLATE/config.yaml` (discussions URL); `.github/PULL_REQUEST_TEMPLATE.md` (`@cassandra` reviewer); `.claude/commands/{pr,release}.md` (`@cassandra` reviewer, image path, install URL) | Your GitHub org/user and the published image path. The `.github` workflows are the CI/CD that builds & publishes the GHCR image and release assets — they make methods 1–2 in *Choose your install method* work. Building from source (method 3) doesn't use any of it. |
+| 12 | GitHub owner & container registry (`cassandra`, `ghcr.io/cassandra/zzz-app`) | `install.sh` (`DOCKER_IMAGE` + the `update.sh` raw URL); `update.sh` (`DOCKER_IMAGE`); `docker-compose.example.yml` (`image:`); `dev/dev-setup.sh` (upstream remote); `.github/workflows/{docker-publish,rollback,release-assets}.yml` (image refs / archive name); `.github/ISSUE_TEMPLATE/config.yaml` (discussions URL); `.github/PULL_REQUEST_TEMPLATE.md` (`@cassandra` reviewer); `.claude/commands/{pr,release}.md` (`@cassandra` reviewer, image path, install URL) | Your GitHub org/user and the published image path. The `.github` workflows are the CI/CD that builds & publishes the GHCR image and release assets — they make methods 1–2 in *Choose your install method* work. Building from source (method 3) doesn't use any of it. |
 
 The app's display name needs no entry here: the page title, the PWA `manifest.json` `name`/`short_name`/`description`, and the Apple web-app title all read `{% settings_value 'SITE_NAME' %}`, which derives from `PROJECT_NAME` (row 3).
 
@@ -190,13 +190,13 @@ to a cloud droplet with MySQL instead, see
 
 | Method | For | What to run / copy / change |
 |--------|-----|------------------------------|
-| **1. Quick self-host** | A single host, Docker only (no compose needed) | `curl -fsSL https://raw.githubusercontent.com/cassandra/zzz/master/install.sh \| bash` — pulls the published image, generates `~/.zzz/env/local.env` (random secret + admin password) and `~/.zzz/docker-compose.yml`, and starts a container named `zzz` on port 9666. `update.sh` updates it in place. Nothing to edit. |
+| **1. Quick self-host** | A single host, Docker only (no compose needed) | `curl -fsSL https://raw.githubusercontent.com/cassandra/zzz-app/master/install.sh \| bash` — pulls the published image, generates `~/.zzz/env/local.env` (random secret + admin password) and `~/.zzz/docker-compose.yml`, and starts a container named `zzz` on port 9666. `update.sh` updates it in place. Nothing to edit. |
 | **2. Self-host via compose** | Folding ZZZ into your own compose stack | Copy `docker-compose.example.yml` → `docker-compose.yml` and `local.env.example` → `local.env`; fill the env placeholders (or `make env-build`); adjust the volume host paths; `docker compose up -d`. |
 | **3. Build from source** | Developers / air-gapped self-host | `make docker-build` (builds `zzz:latest` from `deploy/local/Dockerfile`), then `make docker-run` (background) or `make docker-run-fg`. Uses `~/.zzz/env/local.env` from `make env-build` and host-mounted `~/.zzz/{database,media}`. |
 
 All three share the same **bundled-redis** image: redis runs inside the
 container, so a redeploy flushes the cache — fine for a single host. Methods 1–2
-require the published GitHub Container Registry image (`ghcr.io/cassandra/zzz`);
+require the published GitHub Container Registry image (`ghcr.io/cassandra/zzz-app`);
 until that build is set up, use method 3 to build locally (or point the compose
 `image:` at `zzz:latest`). Configuring the repo to publish that image — default
 branch, Actions, making the GHCR package public — is the one-time

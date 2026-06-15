@@ -48,7 +48,7 @@ cd src
 ## Fork the Repository
 
 - Sign into your GitHub account (required).
-- Go to the main repository on GitHub: https://github.com/cassandra/zzz
+- Go to the main repository on GitHub: https://github.com/cassandra/zzz-app
 - Click the "Fork" button in the upper-right corner. (You will be forking from the `staging` branch.)
 - This creates a copy of the repository in the your GitHub account (keep same name if you can for simplicity).
 - The forked repo will be located at https://github.com/${YOURUSERNAME}/zzz.git (if you kept the same repo name).
@@ -77,7 +77,7 @@ cd zzz
 git config --global user.name "${YOUR_NAME}"
 git config --global user.email "${YOUR_EMAIL}"
 
-git remote add upstream https://github.com/cassandra/zzz.git
+git remote add upstream https://github.com/cassandra/zzz-app.git
 ```
 
 Your "origin" should already be pointing to your forked repository, but check this and the "upstream" settings:
@@ -87,8 +87,8 @@ git remote -v
 # Expect
 origin    https://github.com/${YOURUSERNAME}/zzz.git (fetch)
 origin    https://github.com/${YOURUSERNAME}/zzz.git (push)
-upstream  https://github.com/cassandra/zzz.git (fetch)
-upstream  https://github.com/cassandra/zzz.git (push)
+upstream  https://github.com/cassandra/zzz-app.git (fetch)
+upstream  https://github.com/cassandra/zzz-app.git (push)
 ```
 
 If your origin is not set properly, re-verify after setting with:
