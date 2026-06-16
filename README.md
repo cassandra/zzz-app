@@ -258,6 +258,7 @@ adding it to `INSTALLED_APPS` and running `manage.py migrate`.
 | App | Enable with | Provides |
 |-----|-------------|----------|
 | `background` | `INSTALLED_APPS += ['background']` then `migrate` | Background-process infrastructure for long-running async tasks launched at startup, incl. the `DatabaseLock` table and the `ExclusionLockContext` / `InitializationLockContext` cross-worker locks (`from background.locks import ...`). |
+| `organization` | `INSTALLED_APPS += ['organization]` then `migrate` | Hierarchical organization model for multi-user ownership of data |
 
 ## Optional dependencies
 
