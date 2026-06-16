@@ -63,28 +63,41 @@ it's a top-level sibling.
 
 ## Adapting to a new project
 
-The project is identified by a short acronym (here, `zzz`) and a longer
-display name (here, `Zzz App`). The design goal of this template is to keep
-these touchpoints few and centralized. Shell environment variable **names**
-intentionally keep the acronym prefix (the shell environment is shared and
-needs namespacing); the internal Python identifiers do not, so they stay
-constant across projects.
+This template is identified by **four independent tokens**. Keeping them few
+and centralized is a design goal; adapting to a new project is mostly replacing
+them.
 
-Mechanically, the bulk of the work is **two global, case-insensitive
-search-and-replaces** — the acronym `zzz` → your acronym, and the GitHub
-owner `cassandra` → your owner — plus the handful of *value* changes a
-blind replace cannot make (rows 3, 4, 7, 9, 10 — *not* row 6, whose string
-literals like `zzz.sqlite3` do contain the token and so are caught by the
-replace). The table below explains the **kinds** of change and where the
-non-mechanical values hide; the file lists in it are **illustrative, not
-exhaustive**. For the authoritative, self-updating touchpoint list, the
-search is the checklist:
+| Token | Here | What it identifies |
+|-------|------|--------------------|
+| **acronym** | `zzz` / `ZZZ` | the codebase: the `src/zzz/` package, the `ZZZ_` env-var prefix, the container name, `~/.zzz`, `zzz.sqlite3`, the `constance:zzz:` prefix |
+| **owner** | `cassandra` | your GitHub org/user |
+| **repo / image** | `zzz-app` | the GitHub repository and the GHCR image — deliberately *descriptive* and independent of the acronym |
+| **display name** | `Zzz App` | the human-facing app name (`PROJECT_NAME`, surfaced everywhere as `SITE_NAME`) |
+
+Most of the work is a few global search-and-replaces, but **order and case
+matter**, because two tokens embed the acronym `zzz`:
+
+1. `Zzz App` → your display name  *(title-case literal — do it first)*
+2. `zzz-app` → your repo/image name  *(contains `zzz`, so replace it **before** the bare acronym)*
+3. `zzz` then `ZZZ` → your acronym  *(**case-sensitive**, two passes; this leaves `Zzz App` untouched)*
+4. `cassandra` → your owner
+
+(A case-*insensitive* `zzz` replace would mangle `Zzz App`; replacing the bare
+acronym before `zzz-app` would turn `zzz-app` into `<acronym>-app`.)
+
+The table below explains the **kinds** of change and where the non-mechanical
+*values* hide — the version string, brand color, artwork, and landing copy
+(rows 4, 7, 9, 10), which no token replace can guess. Its file lists are
+**illustrative, not exhaustive**; the authoritative, self-updating checklist is
+the search itself:
 
 ```bash
-# Recommended (in a git repo): searches every tracked file — including dotfiles
-# like src/.flake8 — and auto-skips venv/ data/ .private/ (gitignored).
-git grep -il zzz        # acronym touchpoints
-git grep -il cassandra  # owner touchpoints
+# In a git repo: searches every tracked file (incl. dotfiles like src/.flake8)
+# and auto-skips venv/ data/ .private/ (gitignored).
+git grep -l  "Zzz App"    # display name
+git grep -l  "zzz-app"    # repo / image name
+git grep -il zzz          # acronym  (also matches zzz-app — see ordering above)
+git grep -il cassandra    # owner
 ```
 
 **Caveat:** `grep -r .` and a plain `rg` *silently skip dotfiles* (e.g.
@@ -104,7 +117,7 @@ them with the current prefix, so regenerate rather than hand-edit.
 |---|--------|----------|-------|
 | 1 | Rename the Django config package `zzz/` → new acronym | `src/zzz/` (directory) and its references in `src/manage.py`, `src/zzz/{asgi,wsgi,urls}.py`, `src/zzz/settings/*.py`, `src/zzz/environment/apps.py`, `src/zzz/environment/context_processors.py`, `src/zzz/environment/server.py`, `src/bin/docker-start-gunicorn.sh` (the `zzz.wsgi:application` arg), `Makefile` (the `src/zzz/static` path in `test-js`) | The single largest change, and the clearest case for a global token replace: `zzz.*` import paths, `DJANGO_SETTINGS_MODULE` (e.g. `zzz.settings.development`), and `src/zzz/…` paths also appear in `.github/workflows/django-tests.yml` (`zzz.settings.ci`, `src/zzz/requirements/…`) and the `.claude/` agent/command docs. The replace catches them all. |
 | 2 | `ENV_PREFIX` — shell env var prefix (`ZZZ_`) | `src/zzz/environment/server.py`; and the three places that **cannot** import the app, so they hardcode the `ZZZ_*` set: `deploy/env-generate.py`, `install.sh` (`--list-env-vars`), `local.env.example`. Also the CI env block in `.github/workflows/django-tests.yml`. | In `server.py` it's the single constant every `ZZZ_*` name is built from. The other three are independent copies (a curl-able installer and a static template can't import Python) — `make env-drift-check` verifies all four declare the same variable set, so a missed rename fails CI rather than silently drifting. Global-replace `ZZZ_` in each. |
-| 3 | `PROJECT_NAME` — long display name (`Zzz App`) | `src/zzz/environment/server.py` | Used for display (e.g. `SITE_NAME`) and referenced elsewhere in code. |
+| 3 | `PROJECT_NAME` — **display-name token** (`Zzz App`) | `src/zzz/environment/server.py` | The human-facing name, surfaced everywhere via `SITE_NAME`. Title-case `Zzz App` is *not* matched by the case-sensitive acronym replace, so change it as its own token (step 1 above). |
 | 4 | Version string | `VERSION` (project root) | Generic filename (no acronym) by design; just set the value. |
 | 5 | Per-deployment environment values | `.private/env/development.sh` (and other env files as added) | `DJANGO_SETTINGS_MODULE`, all `ZZZ_*` values, `DJANGO_SECRET_KEY`, superuser email/password, ports, data paths. |
 | 6 | Acronym in settings string-literals | `src/zzz/settings/base.py` | The SQLite filename `zzz.sqlite3` (`DATABASES`) and the `constance:zzz:` key prefix (`CONSTANCE_DATABASE_PREFIX`) — string *values* a package rename won't catch. |
@@ -113,7 +126,7 @@ them with the current prefix, so regenerate rather than hand-edit.
 | 9 | Brand color outside CSS (`#4c5bd4`) | `src/zzz/templates/manifest.json` (`theme_color`, `background_color`); `src/zzz/templates/pages/base.html` (`<meta name="theme-color">`); `src/zzz/static/img/antinode-loading.svg`; `src/notify/templates/notify/emails/base_email_message.html` (header/title; also a `#f5b945` accent border) | The same brand color as the `main.css` palette (row 7), hardcoded in these non-CSS spots a palette change won't catch. |
 | 10 | Placeholder landing copy | `src/zzz/templates/pages/home.html` (landing page); `src/zzz/templates/pages/main_default.html` (`Your tagline here.`) | Replace the placeholder home content and tagline text. |
 | 11 | Docker container/image name & data home (`zzz`, `~/.zzz`) | `Makefile` (`docker-build` image tags, `docker-stop` name); `deploy/local/run_container.sh` (image/container name, `ZZZ_HOME=~/.zzz`, default host port `9666`); `deploy/local/Dockerfile` (the `/etc/supervisor/conf.d/zzz.conf` filename); `install.sh`/`update.sh` (`CONTAINER_NAME`, `ZZZ_HOME`); and, for droplet adopters only, `deploy/droplet/*` (image name, `/opt/zzz`, paths) | String values a package rename won't catch, though all share the `zzz` token (a global acronym replace covers them). The default host port `9666` is the docker mapping (container is always `8000`). **Port convention:** the dev server runs on `8xxx` and the local/deployed (docker) server on `9xxx` — here `8666` / `9666`. The `xxx` is per-project (HI used `411`); change both in lockstep when adapting. This is the "ports" entry of row 5. |
-| 12 | GitHub owner & container registry (`cassandra`, `ghcr.io/cassandra/zzz-app`) | `install.sh` (`DOCKER_IMAGE` + the `update.sh` raw URL); `update.sh` (`DOCKER_IMAGE`); `docker-compose.example.yml` (`image:`); `dev/dev-setup.sh` (upstream remote); `.github/workflows/{docker-publish,rollback,release-assets}.yml` (image refs / archive name); `.github/ISSUE_TEMPLATE/config.yaml` (discussions URL); `.github/PULL_REQUEST_TEMPLATE.md` (`@cassandra` reviewer); `.claude/commands/{pr,release}.md` (`@cassandra` reviewer, image path, install URL) | Your GitHub org/user and the published image path. The `.github` workflows are the CI/CD that builds & publishes the GHCR image and release assets — they make methods 1–2 in *Choose your install method* work. Building from source (method 3) doesn't use any of it. |
+| 12 | **owner** token (`cassandra`) & **repo/image** token (`zzz-app`) | `install.sh` (`DOCKER_IMAGE` + the `update.sh` raw URL); `update.sh` (`DOCKER_IMAGE`); `docker-compose.example.yml` (`image:`); `dev/dev-setup.sh` (upstream remote); `.github/workflows/{docker-publish,rollback,release-assets}.yml` (image refs / `zzz-app.zip` archive name); `.github/ISSUE_TEMPLATE/config.yaml` (discussions URL); `.github/PULL_REQUEST_TEMPLATE.md` (`@cassandra` reviewer); `.claude/commands/{pr,release}.md` (`@cassandra` reviewer, image path, install URL) | Two distinct tokens: your GitHub org/user (`cassandra`), and the repository + GHCR image + release-archive name (`zzz-app`). `zzz-app` is intentionally descriptive and independent of the acronym; it embeds `zzz`, so replace it **before** the bare acronym (step 2 above). The `.github` workflows are the CI/CD that build & publish the GHCR image and release assets — they make methods 1–2 in *Choose your install method* work; a from-source build (method 3) uses none of it. |
 
 The app's display name needs no entry here: the page title, the PWA `manifest.json` `name`/`short_name`/`description`, and the Apple web-app title all read `{% settings_value 'SITE_NAME' %}`, which derives from `PROJECT_NAME` (row 3).
 
