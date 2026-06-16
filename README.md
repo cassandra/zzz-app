@@ -61,6 +61,28 @@ Rule of thumb for new code: if it expands the project's *config/declaration*
 surface it lives in `src/zzz/`; if it's a self-contained app you import and use,
 it's a top-level sibling.
 
+## Adapting - Brief
+
+```
+MY_ACRONYM="ucfp"
+cd design/branding
+mv zzz-icon-inverse.xcf ${MY_ACRONYM}-icon-inverse.xcf
+mv zzz-icon.xcf ${MY_ACRONYM}-icon.xcf
+mv zzz-logo-w-tagline.xcf ${MY_ACRONYM}-logo-w-tagline.xcf
+mv zzz-logo.xcf ${MY_ACRONYM}-logo.xcf
+
+cd ../..
+mv src/zzz src/${MY_ACRONYM}
+
+# Replace all 'zzz'
+
+./dev/dev-setup.sh
+
+. ./dev/init-env-dev.sh
+
+make check
+```
+
 ## Adapting to a new project
 
 This template is identified by **four independent tokens**. Keeping them few

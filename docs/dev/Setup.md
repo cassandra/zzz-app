@@ -14,7 +14,7 @@ For a streamlined setup experience, we provide an automated setup script that ha
 ### Automated Setup
 After cloning your fork, run the setup script from the project root:
 ```bash
-cd zzz
+cd zzz-app
 ./dev/dev-setup.sh
 ```
 
@@ -32,8 +32,8 @@ The script is interactive and will prompt you for necessary information. It's sa
 
 If you prefer to set up manually or need more control over the process, follow these detailed steps (details below):
 ```
-git clone https://github.com/${YOURUSERNAME}/zzz.git
-cd zzz
+git clone https://github.com/${YOURUSERNAME}/zzz-app.git
+cd zzz-app
 make env-build-dev
 python3.11 -m venv venv
 . ./dev/init-env-dev.sh
@@ -51,7 +51,7 @@ cd src
 - Go to the main repository on GitHub: https://github.com/cassandra/zzz-app
 - Click the "Fork" button in the upper-right corner. (You will be forking from the `staging` branch.)
 - This creates a copy of the repository in the your GitHub account (keep same name if you can for simplicity).
-- The forked repo will be located at https://github.com/${YOURUSERNAME}/zzz.git (if you kept the same repo name).
+- The forked repo will be located at https://github.com/${YOURUSERNAME}/zzz-app.git (if you kept the same repo name).
 
 ## Local Repository Setup
 
@@ -64,15 +64,15 @@ cd $PROJ_DIR
 
 Clone your fork to your local development environment:
 ``` shell
-git clone https://github.com/${YOURUSERNAME}/zzz.git
+git clone https://github.com/${YOURUSERNAME}/zzz-app.git
 
 # Or use the SSH URL if you have SSH keys set up:
-git clone git@github.com:${YOURUSERNAME}/zzz.git
+git clone git@github.com:${YOURUSERNAME}/zzz-app.git
 ```
 
 Now change into that directory and configure the repo including adding the source as the "upstream" target: 
 ``` shell
-cd zzz
+cd zzz-app
 
 git config --global user.name "${YOUR_NAME}"
 git config --global user.email "${YOUR_EMAIL}"
@@ -85,18 +85,18 @@ Your "origin" should already be pointing to your forked repository, but check th
 git remote -v
 
 # Expect
-origin    https://github.com/${YOURUSERNAME}/zzz.git (fetch)
-origin    https://github.com/${YOURUSERNAME}/zzz.git (push)
+origin    https://github.com/${YOURUSERNAME}/zzz-app.git (fetch)
+origin    https://github.com/${YOURUSERNAME}/zzz-app.git (push)
 upstream  https://github.com/cassandra/zzz-app.git (fetch)
 upstream  https://github.com/cassandra/zzz-app.git (push)
 ```
 
 If your origin is not set properly, re-verify after setting with:
 ``` shell
-git remote add origin git@github.com:${YOURUSERNAME}/zzz.git
+git remote add origin git@github.com:${YOURUSERNAME}/zzz-app.git
 
 # If no SSH keys were added to GitHub, you'll need this instead:
-git remote set-url origin https://github.com/${YOURUSERNAME}/zzz.git
+git remote set-url origin https://github.com/${YOURUSERNAME}/zzz-app.git
 ```
 
 ## Environment Setup

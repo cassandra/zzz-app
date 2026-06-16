@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Deploy ZZZ to a production droplet.
+# Deploy Zzz App to a production droplet.
 #
 # Prerequisites:
 #   - Docker running locally
@@ -22,7 +22,7 @@ DEPLOY_PATH="/opt/zzz"
 ZZZ_VERSION=$(cat VERSION)
 IMAGE_FILE="/tmp/zzz-docker-image-${ZZZ_VERSION}.tar.gz"
 
-echo "=== Deploying ZZZ ${ZZZ_VERSION} to production ==="
+echo "=== Deploying Zzz App ${ZZZ_VERSION} to production ==="
 
 # Pre-flight checks
 echo "Checking prerequisites..."

@@ -1,4 +1,4 @@
-# ZZZ — droplet/cloud production compose file.
+# Zzz App — droplet/cloud production compose file.
 #
 # Deployed to the droplet by deploy/droplet/deploy-prod.sh (which scp's this
 # file as docker-compose.yml alongside the converted env file zzz.env). Uses

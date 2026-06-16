@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# ZZZ Development Setup Script
+# Zzz App Development Setup Script
 # 
 # This script automates the development environment setup for new developers.
 # It handles git configuration, environment setup, virtual environment creation,
@@ -110,7 +110,7 @@ command_exists() {
 }
 
 # Main setup script starts here
-print_important "ZZZ Development Setup
+print_important "Zzz App Development Setup
 
 This script will help you set up your development environment.
 It will guide you through:
@@ -128,7 +128,7 @@ print_notice "Step 1: Pre-flight Checks"
 # Check if we're in the project root
 if [[ ! -f "VERSION" || ! -d "deploy" || ! -d "docs" ]]; then
     print_error "This script must be run from the project root directory."
-    print_notice "Please cd to the zzz directory and try again."
+    print_notice "Please cd to the zzz-app directory and try again."
     exit 1
 fi
 print_success "Running from correct directory"
@@ -225,9 +225,9 @@ if [[ -z "$CURRENT_ORIGIN" ]]; then
     GITHUB_USERNAME=$(prompt_string "Enter your GitHub username")
     
     if prompt_yes_no "Do you have SSH keys set up with GitHub?" "n"; then
-        git remote add origin "git@github.com:${GITHUB_USERNAME}/zzz.git"
+        git remote add origin "git@github.com:${GITHUB_USERNAME}/zzz-app.git"
     else
-        git remote add origin "https://github.com/${GITHUB_USERNAME}/zzz.git"
+        git remote add origin "https://github.com/${GITHUB_USERNAME}/zzz-app.git"
     fi
     print_success "Origin remote configured"
 else
@@ -236,7 +236,7 @@ fi
 
 if [[ -z "$CURRENT_UPSTREAM" ]]; then
     print_notice "Adding upstream remote"
-    git remote add upstream https://github.com/cassandra/zzz-app.git
+    git remote add upstream https://github.com/${GITHUB_USERNAME}/zzz-app.git
     print_success "Upstream remote configured"
 else
     print_success "Upstream remote already configured"

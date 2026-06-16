@@ -12,7 +12,7 @@
 #
 # If you ran install.sh, your live config is at `~/.zzz/docker-compose.yml` —
 # edit that, not this. This file is here only as a reference for users who want
-# to integrate ZZZ into their own compose stack.
+# to integrate Zzz App into their own compose stack.
 #
 # The image below pulls the published GitHub Container Registry build. To run a
 # locally-built image instead, `make docker-build` and change the image to

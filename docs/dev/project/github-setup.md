@@ -53,7 +53,7 @@ default settings; do not lock the repo to read-only-with-no-overrides.
 ## 3. GHCR container image (must be PUBLIC for the installer)
 
 `docker-publish.yml` pushes the self-host image to
-`ghcr.io/<owner>/zzz:<version>` and `:latest`, and `install.sh` / `update.sh`
+`ghcr.io/<owner>/zzz-app:<version>` and `:latest`, and `install.sh` / `update.sh`
 do an **unauthenticated** `docker pull` of it.
 
 **Setup:**
@@ -71,7 +71,7 @@ registry-distributed install methods 1-2 do.)
 ## 4. GitHub Discussions
 
 `.github/ISSUE_TEMPLATE/config.yaml` sets `blank_issues_enabled: false` and adds
-a contact link to `https://github.com/<owner>/zzz/discussions`.
+a contact link to `https://github.com/<owner>/zzz-app/discussions`.
 
 **Setup:** enable Discussions so that link doesn't 404 -- at
 `https://github.com/<owner>/<project>/settings` (the *General* page), scroll to

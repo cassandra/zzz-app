@@ -83,10 +83,10 @@ git checkout -b feature/$(ISSUE_NUM}-${MNEMONIC} upstream/staging
 
 ## Submit a Pull Request (PR)
 
-- Go to your fork on GitHub: https://github.com/${YOURUSERNAME}/zzz
+- Go to your fork on GitHub: https://github.com/${YOURUSERNAME}/zzz-app
 - Click the "Compare & pull request" button that appears after your push.
 - Ensure the base repository is set to `cassandra/zzz-app -> staging`
-- Ensure the compare branch is set to: `${YOURUSERNAME}/zzz -> feature/${YOUR_FEATURE_NAME}`
+- Ensure the compare branch is set to: `${YOURUSERNAME}/zzz-app -> feature/${YOUR_FEATURE_NAME}`
 - Fill out the PR template (describe what your change does).
 - If applicable, add a line that says which ticket it closes. i.e., "Closes #39"
 - Submit the PR and wait for review!

@@ -1,5 +1,5 @@
 """
-ASGI config for zzz project.
+ASGI config for Zzz App project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 

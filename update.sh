@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e  # Exit on any error
 
-# ZZZ - Update Script
-# Updates an existing ZZZ installation to the latest version
+# Zzz App - Update Script
+# Updates an existing Zzz App installation to the latest version
 # Requires: Docker and existing installation
 
 # Configuration
@@ -34,7 +34,7 @@ NC='\033[0m' # No Color
 
 print_header() {
     echo -e "${BLUE}================================${NC}"
-    echo -e "${BLUE} ZZZ Updater${NC}"
+    echo -e "${BLUE} Zzz App Updater${NC}"
     echo -e "${BLUE}================================${NC}"
 }
 
@@ -167,7 +167,7 @@ show_success() {
     echo -e "${GREEN} Update Complete!${NC}"
     echo -e "${GREEN}================================${NC}"
     echo
-    echo -e "${BLUE}🌐 Access your updated ZZZ system:${NC}"
+    echo -e "${BLUE}🌐 Access your updated Zzz App system:${NC}"
     echo -e "   ${BLUE}http://localhost:${EXTERNAL_PORT}${NC}"
     echo
     echo -e "${BLUE}📊 Status check:${NC}"
