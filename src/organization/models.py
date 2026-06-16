@@ -64,8 +64,8 @@ class OrganizationMember( TimestampedModel ):
     """A user's membership in an organization, carrying their role.
 
     The model guards one invariant: an organization must always retain at least
-    one active owner. An operation that would drop the last active owner —
-    deleting, demoting, or deactivating it — raises LastActiveOwnerError. The
+    one active owner. An operation that would drop the last active owner --
+    deleting, demoting, or deactivating it -- raises LastActiveOwnerError. The
     check runs under a row lock on the organization, so it is safe against
     concurrent owner changes. (Bulk queryset operations such as
     `QuerySet.update()`/`delete()` bypass these hooks and are not guarded.)
@@ -165,7 +165,7 @@ class OrganizationInvitation( TimestampedModel ):
     The invitation is the durable record of a pending or closed invite. The role
     to grant lives here; no membership exists until acceptance. The invitee is
     identified by an email address, by a directly referenced user (e.g. resolved
-    from a UUID), or both — at least one is required (enforced by a check
+    from a UUID), or both -- at least one is required (enforced by a check
     constraint). Accepting creates or reactivates the active membership.
 
     At most one WAITING invitation may exist per organization for a given email,
@@ -252,7 +252,7 @@ class OrganizationInvitation( TimestampedModel ):
         """Accept this invitation on behalf of `user`, returning the active
         OrganizationMember.
 
-        Requires WAITING status and that `user` is the invitation's recipient —
+        Requires WAITING status and that `user` is the invitation's recipient --
         either the linked `invited_user`, or a case-insensitive match on the
         invitation email. Idempotent if the user already has a membership: an
         inactive one is reactivated, and an existing role is left unchanged.

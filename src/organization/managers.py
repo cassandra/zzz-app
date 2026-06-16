@@ -57,7 +57,7 @@ class OrganizationInvitationManager( models.Manager ):
         `invited_by` (required).
 
         The invitee is identified by `email`, by `invited_user` (e.g. resolved
-        from a UUID), or both — at least one is required. When only `email` is
+        from a UUID), or both -- at least one is required. When only `email` is
         given and it maps to an existing user, that user is linked as
         `invited_user` so deduplication is consistent across both dimensions.
 

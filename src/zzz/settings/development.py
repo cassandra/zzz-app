@@ -4,9 +4,9 @@ from .base import *
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# Opt-in multi-tenancy app (issue #1). Kept out of base INSTALLED_APPS so it is
-# genuinely optional; installed here (and in ci.py) so it migrates and its tests
-# run in development and CI, while staging/production carry no trace of it.
+# Opt-in multi-tenancy app. Kept out of base INSTALLED_APPS so it is genuinely
+# optional; installed here so it migrates and its tests run, while
+# staging/production carry no trace of it.
 INSTALLED_APPS += [
     'organization',
 ]
