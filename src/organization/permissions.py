@@ -6,18 +6,23 @@ organization. Mapping roles to concrete capabilities, and resolving which
 organization a request targets, are the application's responsibility.
 """
 from functools import wraps
+from typing import Callable
 
+from django.contrib.auth.models import User as UserType
 from django.core.exceptions import PermissionDenied
 
-from .models import OrganizationMember
+from .enums import OrganizationRole
+from .models import Organization, OrganizationMember
 
 
 class OrganizationPermissions:
 
     @classmethod
-    def get_membership( cls, user, organization ):
+    def get_membership( cls,
+                        user         : UserType,
+                        organization : Organization ) -> OrganizationMember:
         """Return `user`'s active membership in `organization`, or None."""
-        if user is None or not user.is_authenticated:
+        if ( user is None ) or ( not user.is_authenticated ):
             return None
         return OrganizationMember.objects.filter(
             organization = organization,
@@ -26,7 +31,10 @@ class OrganizationPermissions:
         ).first()
 
     @classmethod
-    def has_role( cls, user, organization, *roles ):
+    def has_role( cls,
+                  user         : UserType,
+                  organization : Organization,
+                  *roles       : OrganizationRole ) -> bool:
         """True if `user` has an active membership in `organization` with one of
         `roles`.
 
@@ -37,10 +45,12 @@ class OrganizationPermissions:
         membership = cls.get_membership( user, organization )
         if membership is None:
             return False
-        return membership.organization_role in roles
+        return bool( membership.organization_role in roles )
 
     @classmethod
-    def require_role( cls, *roles, organization_getter ):
+    def require_role( cls,
+                      *roles              : OrganizationRole,
+                      organization_getter : Callable ) -> Callable:
         """Build a view decorator that requires one of `roles` in the
         organization that `organization_getter(request, *args, **kwargs)`
         resolves.
