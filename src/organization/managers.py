@@ -1,7 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.db import models, transaction
 
-from .enums import OrganizationRole
+from .enums import OrganizationInvitationStatus, OrganizationRole
+from .exceptions import AlreadyActiveMemberError, DuplicateInvitationError
 
 
 class OrganizationManager( models.Manager ):
@@ -47,3 +48,63 @@ class OrganizationMemberManager( models.Manager ):
             organization_role = OrganizationRole.OWNER,
             is_active = True,
         )
+
+
+class OrganizationInvitationManager( models.Manager ):
+
+    def invite( self, organization, role, invited_by, email = None, invited_user = None ):
+        """Create a WAITING invitation to join `organization` as `role`, sent by
+        `invited_by` (required).
+
+        The invitee is identified by `email`, by `invited_user` (e.g. resolved
+        from a UUID), or both — at least one is required. When only `email` is
+        given and it maps to an existing user, that user is linked as
+        `invited_user` so deduplication is consistent across both dimensions.
+
+        Raises:
+          - ValueError if `invited_by` is None, or neither `email` nor
+            `invited_user` is given;
+          - AlreadyActiveMemberError if the resolved user is already an active
+            member of the organization;
+          - DuplicateInvitationError if a pending invitation already exists for
+            this organization and the same email or user.
+
+        Closed invitations (accepted/declined/revoked) are retained as history
+        and do not block re-inviting; a former (inactive) member is re-invitable
+        and is reactivated on acceptance.
+        """
+        if invited_by is None:
+            raise ValueError( 'invited_by is required to create an invitation.' )
+        if email is not None:
+            email = email.strip() or None
+        if email is None and invited_user is None:
+            raise ValueError( 'an invitation requires an email address or a user.' )
+        if invited_user is None and email is not None:
+            invited_user = get_user_model().objects.filter( email__iexact = email ).first()
+        if invited_user is not None and invited_user.organization_members.filter(
+                organization = organization, is_active = True ).exists():
+            raise AlreadyActiveMemberError(
+                'The invited user is already an active member of this organization.'
+            )
+        if self._pending_exists( organization, email, invited_user ):
+            raise DuplicateInvitationError(
+                'A pending invitation already exists for this email or user.'
+            )
+        return self.create(
+            organization = organization,
+            email_address = email,
+            organization_role = role,
+            invited_by = invited_by,
+            invited_user = invited_user,
+        )
+
+    def _pending_exists( self, organization, email, invited_user ):
+        pending = self.filter(
+            organization = organization,
+            status = OrganizationInvitationStatus.WAITING,
+        )
+        if email is not None and pending.filter( email_address__iexact = email ).exists():
+            return True
+        if invited_user is not None and pending.filter( invited_user = invited_user ).exists():
+            return True
+        return False

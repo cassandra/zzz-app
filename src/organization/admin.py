@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Organization, OrganizationMember
+from .models import Organization, OrganizationInvitation, OrganizationMember
 
 
 @admin.register( Organization )
@@ -39,4 +39,26 @@ class OrganizationMemberAdmin( admin.ModelAdmin ):
     search_fields = (
         'organization__name',
         'user__email',
+    )
+
+
+@admin.register( OrganizationInvitation )
+class OrganizationInvitationAdmin( admin.ModelAdmin ):
+    show_full_result_count = False
+
+    list_display = (
+        'email_address',
+        'invited_user',
+        'organization',
+        'organization_role',
+        'status',
+        'invited_by',
+        'created_datetime',
+    )
+    list_filter = (
+        'status',
+    )
+    search_fields = (
+        'email_address',
+        'organization__name',
     )

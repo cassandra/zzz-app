@@ -2,13 +2,22 @@ import uuid
 
 from django.conf import settings
 from django.db import models, transaction
+from django.db.models.functions import Lower
 
 from common.labeled_enum import LabeledEnumField
 from common.models import TimestampedModel
 
-from .enums import OrganizationRole
-from .exceptions import LastActiveOwnerError
-from .managers import OrganizationManager, OrganizationMemberManager
+from .enums import OrganizationInvitationStatus, OrganizationRole
+from .exceptions import (
+    InvitationRecipientMismatchError,
+    InvitationStateError,
+    LastActiveOwnerError,
+)
+from .managers import (
+    OrganizationInvitationManager,
+    OrganizationManager,
+    OrganizationMemberManager,
+)
 
 
 class Organization( TimestampedModel ):
@@ -126,6 +135,18 @@ class OrganizationMember( TimestampedModel ):
                 return super().delete( *args, **kwargs )
         return super().delete( *args, **kwargs )
 
+    def deactivate( self ):
+        """Soft-leave: mark the membership inactive, retaining the row.
+
+        This is the conventional "left the organization" path (a person keeps
+        their single membership row and can be reactivated on a later accept).
+        It goes through `save()`, so deactivating the last active owner is
+        rejected.
+        """
+        self.is_active = False
+        self.save()
+        return
+
     def _assert_another_active_owner_exists( self ):
         # Lock the organization row so concurrent owner changes serialize: two
         # simultaneous demotions cannot each observe the other as still active.
@@ -136,3 +157,149 @@ class OrganizationMember( TimestampedModel ):
         if not another_exists:
             raise LastActiveOwnerError( self._LAST_OWNER_MESSAGE )
         return
+
+
+class OrganizationInvitation( TimestampedModel ):
+    """An invitation to join an organization in a role.
+
+    The invitation is the durable record of a pending or closed invite. The role
+    to grant lives here; no membership exists until acceptance. The invitee is
+    identified by an email address, by a directly referenced user (e.g. resolved
+    from a UUID), or both — at least one is required (enforced by a check
+    constraint). Accepting creates or reactivates the active membership.
+
+    At most one WAITING invitation may exist per organization for a given email,
+    and per organization for a given user; closed invitations are retained as
+    history and do not block re-inviting.
+    """
+
+    objects = OrganizationInvitationManager()
+
+    organization = models.ForeignKey(
+        Organization,
+        verbose_name = 'Organization',
+        related_name = 'invitations',
+        on_delete = models.CASCADE,
+        null = False,
+        blank = False,
+    )
+    invited_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name = 'Invited By',
+        related_name = 'sent_organization_invitations',
+        on_delete = models.SET_NULL,
+        null = True,
+        blank = True,
+    )
+    invited_user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name = 'Invited User',
+        related_name = 'received_organization_invitations',
+        on_delete = models.SET_NULL,
+        null = True,
+        blank = True,
+    )
+    email_address = models.EmailField(
+        'Email Address',
+        null = True,
+        blank = True,
+    )
+    organization_role = LabeledEnumField(
+        OrganizationRole,
+        verbose_name = 'Role',
+    )
+    status = LabeledEnumField(
+        OrganizationInvitationStatus,
+        verbose_name = 'Status',
+    )
+
+    class Meta:
+        verbose_name = 'Organization Invitation'
+        verbose_name_plural = 'Organization Invitations'
+        constraints = [
+            models.CheckConstraint(
+                condition = (
+                    models.Q( email_address__isnull = False )
+                    | models.Q( invited_user__isnull = False )
+                ),
+                name = 'invitation_has_email_or_user',
+            ),
+            models.UniqueConstraint(
+                Lower( 'email_address' ),
+                'organization',
+                condition = models.Q(
+                    status = str( OrganizationInvitationStatus.WAITING ),
+                    email_address__isnull = False,
+                ),
+                name = 'unique_pending_invitation_per_org_email',
+            ),
+            models.UniqueConstraint(
+                'invited_user',
+                'organization',
+                condition = models.Q(
+                    status = str( OrganizationInvitationStatus.WAITING ),
+                    invited_user__isnull = False,
+                ),
+                name = 'unique_pending_invitation_per_org_user',
+            ),
+        ]
+
+    def __str__(self):
+        recipient = self.email_address or self.invited_user
+        return f'{recipient} -> {self.organization} ({self.status.label})'
+
+    def accept( self, user ):
+        """Accept this invitation on behalf of `user`, returning the active
+        OrganizationMember.
+
+        Requires WAITING status and that `user` is the invitation's recipient —
+        either the linked `invited_user`, or a case-insensitive match on the
+        invitation email. Idempotent if the user already has a membership: an
+        inactive one is reactivated, and an existing role is left unchanged.
+        """
+        if self.status != OrganizationInvitationStatus.WAITING:
+            raise InvitationStateError( 'Only a pending invitation can be accepted.' )
+        if not self._can_be_accepted_by( user ):
+            raise InvitationRecipientMismatchError(
+                'The accepting user does not match the invitation.'
+            )
+        with transaction.atomic():
+            member, created = OrganizationMember.objects.get_or_create(
+                organization = self.organization,
+                user = user,
+                defaults = {
+                    'organization_role': self.organization_role,
+                    'is_active': True,
+                },
+            )
+            if not created and not member.is_active:
+                member.is_active = True
+                member.save()
+            self.invited_user = user
+            self.status = OrganizationInvitationStatus.ACCEPTED
+            self.save()
+        return member
+
+    def decline( self ):
+        """Decline this pending invitation (by the invitee)."""
+        self._close( OrganizationInvitationStatus.DECLINED )
+        return
+
+    def revoke( self ):
+        """Revoke this pending invitation (by the organization)."""
+        self._close( OrganizationInvitationStatus.REVOKED )
+        return
+
+    def _close( self, new_status ):
+        if self.status != OrganizationInvitationStatus.WAITING:
+            raise InvitationStateError( 'Only a pending invitation can change state.' )
+        self.status = new_status
+        self.save()
+        return
+
+    def _can_be_accepted_by( self, user ):
+        if self.invited_user_id is not None and self.invited_user_id == user.pk:
+            return True
+        if self.email_address and user.email and user.email.lower() == self.email_address.lower():
+            return True
+        return False

@@ -78,6 +78,21 @@ class LastActiveOwnerInvariantTestCase( BaseTestCase ):
             self.owner.delete()
         return
 
+    def test_deactivate_helper_soft_leaves_a_member(self):
+        member = self._add_member( 'member@example.com', OrganizationRole.MEMBER )
+        member.deactivate()
+        member.refresh_from_db()
+        self.assertFalse( member.is_active )
+        self.assertTrue( OrganizationMember.objects.filter( pk = member.pk ).exists() )
+        return
+
+    def test_deactivate_helper_blocks_last_active_owner(self):
+        with self.assertRaises( LastActiveOwnerError ):
+            self.owner.deactivate()
+        self.owner.refresh_from_db()
+        self.assertTrue( self.owner.is_active )
+        return
+
     def test_promoting_a_member_to_owner_is_allowed(self):
         member = self._add_member( 'member@example.com', OrganizationRole.MEMBER )
         member.organization_role = OrganizationRole.OWNER

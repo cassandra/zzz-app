@@ -16,3 +16,16 @@ class OrganizationRole( LabeledEnum ):
     @classmethod
     def default(cls):
         return cls.MEMBER
+
+
+class OrganizationInvitationStatus( LabeledEnum ):
+    """Lifecycle state of an organization invitation."""
+
+    WAITING   = ( 'Waiting'  , 'Awaiting the invitee response.' )
+    ACCEPTED  = ( 'Accepted' , 'The invitee accepted and joined the organization.' )
+    DECLINED  = ( 'Declined' , 'The invitee declined the invitation.' )
+    REVOKED   = ( 'Revoked'  , 'The invitation was withdrawn by the organization.' )
+
+    @classmethod
+    def default(cls):
+        return cls.WAITING
