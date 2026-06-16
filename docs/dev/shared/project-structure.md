@@ -39,6 +39,12 @@ are siblings.
 
 All new files should adhere to these naming and directory conventions.
 
+### New Application Modules / Django Apps
+
+New coherent and semi-independent subsystems that are domain-specific, should be placed in `src/ucfp/${MODULE_NAME}` where `MODULE_ANME` is the name of the module that would be added to `INSTALLED_APPS`.
+
+If a new module si introduced that is generally useful across many domains, it is worth considering if it should be added to the base `https://github.com/cassandra/zzz-app` project for future project use.
+
 ### Application Module Structure
 
 **Filenames: Django Conventions**:
