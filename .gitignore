@@ -25,6 +25,12 @@ __pycache__/
 /*.html
 /docs/**/*.html
 
+!.gitignore
+!.dockerignore
+
+!src/.flake8
+!src/.flake8-ci
+
 !.github/
 
 # .claude/ -- include agents/ and commands/, ignore runtime state
